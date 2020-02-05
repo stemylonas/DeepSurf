@@ -3,7 +3,8 @@ __pycache__/
 *~
 results/
 models/
-lib/
+*.so
+*.o
 *.7z
 
 
