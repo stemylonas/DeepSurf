@@ -20,7 +20,7 @@ class Protein:
         self.mol = pybel.readfile(prot_file.split('.')[-1],prot_file).next() 
         surfpoints_file = os.path.join(self.save_path,prot_id+'.surfpoints')
         os.system('dms '+prot_file+' -d 0.2 -n -o '+surfpoints_file)
-        self.surf_points, self.surf_normals = simplify_dms(surfpoints_file,f)   # do we need H2 for surf calculation?
+        self.surf_points, self.surf_normals = simplify_dms(surfpoints_file,f)   
         if protonate:      
             self.mol.addh()
         self.atom_coords = np.array([atom.coords for atom in self.mol.atoms])
@@ -31,7 +31,7 @@ class Protein:
         elif prot_file.endswith('mol2'):
             self.lines = mol2_reader(prot_file)
         else:
-            print 'No pdb or mol2'  # exception?
+            raise IOError('Protein file should be either .pdb or .mol2')
         
         self.expand_residue = expand_residue   # den prepei na exei H2
         if expand_residue:

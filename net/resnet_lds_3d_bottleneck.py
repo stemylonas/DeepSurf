@@ -21,7 +21,7 @@ from tensorflow.python.ops import nn_ops
 from tensorflow.python.ops import variable_scope
 import resnet_3d_utils
 
-import amul as amul_module
+from lds import amul as amul_module
 
 resnet_arg_scope = resnet_3d_utils.resnet_arg_scope
 
@@ -165,7 +165,7 @@ def resnet_block(scope, depth_out, num_units, stride):
   }])
 
 
-def resnet(inputs,
+def resnet_v1_18(inputs,
            num_classes,
            is_training,
            global_pool=True,

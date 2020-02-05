@@ -7,7 +7,7 @@ Created on Mon Oct 21 11:46:54 2019
 """
 
 import tfbio_data 
-from rotation import rotation_quaternion
+from lib import rotation
 import numpy as np
      
 
@@ -25,7 +25,7 @@ class KalasantyFeaturizer:
     
     def grid_feats(self,point,normal,mol_coords):
         neigh_atoms = np.sqrt(np.sum((mol_coords-point)**2,axis=1))<self.neigh_radius
-        Q = rotation_quaternion(normal)
+        Q = rotation(normal)
         Q_inv = np.linalg.inv(Q)
         transf_coords = np.transpose(mol_coords[neigh_atoms]-point)
         rotated_mol_coords = np.matmul(Q_inv,transf_coords)

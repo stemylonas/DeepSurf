@@ -8,12 +8,8 @@ Created on Tue Jul 30 13:39:49 2019
 
 import numpy as np
 from scipy.spatial.distance import euclidean
-#from rotation import rotation_quaternion
-#from moleculekit.molecule import Molecule
-#from moleculekit.tools.voxeldescriptors import _getOccupancyC
-#from scipy.cluster.hierarchy import fclusterdata
 from sklearn.cluster import KMeans
-#from collections import defaultdict
+
 
 
 def mol2_reader(mol_file):
@@ -89,7 +85,39 @@ def simplify_dms(init_surf_file, factor):
     return coords[idxs], normals[idxs]
 
 
-                                                                              
+def rotation(n):
+    if n[0]==0.0 and n[1]==0.0:
+        if n[2]==1.0:
+            return np.identity(3)
+        elif n[2]==-1.0:
+            Q = np.identity(3)
+            Q[0,0] = -1
+            return Q
+        else:
+            print 'not possible'
+        
+    rx = -n[1]/np.sqrt(n[0]*n[0]+n[1]*n[1])
+    ry = n[0]/np.sqrt(n[0]*n[0]+n[1]*n[1])
+    rz = 0
+    th = np.arccos(n[2])
+    
+    q0 = np.cos(th/2)
+    q1 = np.sin(th/2)*rx
+    q2 = np.sin(th/2)*ry
+    q3 = np.sin(th/2)*rz
+               
+    Q = np.zeros((3,3))
+    Q[0,0] = q0*q0+q1*q1-q2*q2-q3*q3
+    Q[0,1] = 2*(q1*q2-q0*q3)
+    Q[0,2] = 2*(q1*q3+q0*q2)
+    Q[1,0] = 2*(q1*q2+q0*q3)
+    Q[1,1] = q0*q0-q1*q1+q2*q2-q3*q3
+    Q[1,2] = 2*(q3*q2-q0*q1)
+    Q[2,0] = 2*(q1*q3-q0*q2)
+    Q[2,1] = 2*(q3*q2+q0*q1)
+    Q[2,2] = q0*q0-q1*q1-q2*q2+q3*q3
+     
+    return Q                                                                              
 
 
     

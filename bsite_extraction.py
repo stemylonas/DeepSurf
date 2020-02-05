@@ -19,12 +19,12 @@ class Bsite_extractor():
         T_new = self.T
         while sum(lig_scores>=T_new) < 10 and T_new>0.3001:    # at least 10 points with prob>P  and P>=0.3
             T_new -= 0.1 
-        
+
         filtered_points = prot.surf_points[lig_scores>T_new]
         filtered_scores = lig_scores[lig_scores>T_new]
         if len(filtered_points)<5:
             return np.array([]), np.array([]), np.array([]), np.array([])  # raise exception?
-    
+        print filtered_scores
         clustering = self.ms.fit(filtered_points)
         labels = clustering.labels_
         
@@ -39,14 +39,13 @@ class Bsite_extractor():
         if unique_l[0]==-1:                 # discard the "unclustered" cluster
             unique_l = unique_l[1:]    
         
-      #  avg_scores = np.array([np.average()])
         clusters = [(filtered_points[labels==l],filtered_scores[labels==l]) for l in unique_l]
         
         return clusters
         
     def extract_bsites(self,prot,lig_scores):
         clusters = self._cluster_points(prot,lig_scores)
-        
+        print len(clusters)
         for cluster in clusters:
             prot.add_bsite(cluster)
         prot.sort_bsites()
