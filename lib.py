@@ -12,7 +12,7 @@ from sklearn.cluster import KMeans
 
 
 
-def mol2_reader(mol_file):
+def mol2_reader(mol_file):  # does not handle H2
     if mol_file[-4:] != 'mol2':
         print 'cant read no mol2 file'
         return
@@ -66,6 +66,7 @@ def readSurfPoints(surf_file):
 def simplify_dms(init_surf_file, factor):
     
     coords, normals = readSurfPoints(init_surf_file)
+
     nPoints = len(coords)
     nCl = nPoints/factor
     

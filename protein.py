@@ -12,7 +12,7 @@ from lib import simplify_dms, mol2_reader
 
 
 class Protein:
-    def __init__(self,prot_file,protonate,expand_residue,f,save_path):
+    def __init__(self,prot_file,protonate,expand_residue,f,save_path,discard_points):
         prot_id = prot_file.split('/')[-1].split('.')[0]
         self.save_path = os.path.join(save_path,prot_id)
         if not os.path.exists(self.save_path):
@@ -20,23 +20,36 @@ class Protein:
         self.mol = pybel.readfile(prot_file.split('.')[-1],prot_file).next() 
         surfpoints_file = os.path.join(self.save_path,prot_id+'.surfpoints')
         os.system('dms '+prot_file+' -d 0.2 -n -o '+surfpoints_file)
-        self.surf_points, self.surf_normals = simplify_dms(surfpoints_file,f)   
-        if protonate:      
-            self.mol.addh()
-        self.atom_coords = np.array([atom.coords for atom in self.mol.atoms])
+        if not os.path.exists(surfpoints_file):
+            raise Exception('probably DMS not installed')
+        self.surf_points, self.surf_normals = simplify_dms(surfpoints_file,f)  
+        if discard_points:
+            os.remove(surfpoints_file)
+            
+        self.expand_residue = expand_residue
+        if expand_residue:
+            self.removeh()
+            self.atom2residue = np.array([atom.residue.idx for atom in self.mol.atoms])
+            self.residue2atom = np.array([[atom.idx - 1 for atom in resid.atoms] for resid in self.mol.residues])
+            self.addh()
+        else:
+            if protonate:      
+                self.mol.addh()
+            self.atom_coords = np.array([atom.coords for atom in self.mol.atoms])
+        
         self.binding_sites = []
         if prot_file.endswith('pdb'):
             with open(prot_file,'r') as f:    
-                self.lines = f.readlines()
-        elif prot_file.endswith('mol2'):
-            self.lines = mol2_reader(prot_file)
+                lines = f.readlines()
+                self.lines = [line for line in lines if line[:4]=='ATOM' and line.split()[2][0]!='H']            
         else:
-            raise IOError('Protein file should be either .pdb or .mol2')
+            raise IOError('Protein file should be .pdb')
         
-        self.expand_residue = expand_residue   # den prepei na exei H2
-        if expand_residue:
-            self.atom2residue = np.array([atom.residue.idx for atom in self.mol.atoms])
-            self.residue2atom = np.array([[atom.idx - 1 for atom in resid.atoms] for resid in self.mol.residues])
+        
+    
+    def addh(self):
+        self.mol.addh()
+        self.atom_coords = np.array([atom.coords for atom in self.mol.atoms])
     
     def removeh(self):
         self.mol.removeh()

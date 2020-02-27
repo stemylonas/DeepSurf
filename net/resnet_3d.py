@@ -63,7 +63,7 @@ def resid_unit(inputs,
           scope='shortcut')
 
     residual = resnet_3d_utils.conv3d_same(inputs, depth_bottleneck, 3, stride=1, scope='conv1')   
-    residual = layers.conv3d(residual, depth_bottleneck, 3, stride, activation_fn=None, scope='conv2')
+    residual = layers.conv3d(residual, depth_bottleneck, 3, stride, scope='conv2')
 
     output = nn_ops.relu(shortcut + residual)
 

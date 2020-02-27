@@ -23,8 +23,8 @@ class Bsite_extractor():
         filtered_points = prot.surf_points[lig_scores>T_new]
         filtered_scores = lig_scores[lig_scores>T_new]
         if len(filtered_points)<5:
-            return np.array([]), np.array([]), np.array([]), np.array([])  # raise exception?
-        print filtered_scores
+            return () 
+
         clustering = self.ms.fit(filtered_points)
         labels = clustering.labels_
         
@@ -33,8 +33,7 @@ class Bsite_extractor():
         if len(unique_l[freq>=5])!=0:
             unique_l = unique_l[freq>=5]    # keep clusters with 5 points and more
         else:
-            print 'asasa'  # raise exception?
-            return
+            return ()
         
         if unique_l[0]==-1:                 # discard the "unclustered" cluster
             unique_l = unique_l[1:]    
@@ -45,7 +44,8 @@ class Bsite_extractor():
         
     def extract_bsites(self,prot,lig_scores):
         clusters = self._cluster_points(prot,lig_scores)
-        print len(clusters)
+        if len(clusters)==0:
+            return
         for cluster in clusters:
             prot.add_bsite(cluster)
         prot.sort_bsites()

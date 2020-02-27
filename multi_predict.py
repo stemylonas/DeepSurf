@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jan 20 16:16:56 2020
+Created on Tue Feb 25 16:04:47 2020
 
 @author: smylonas
 """
@@ -15,7 +15,8 @@ from bsite_extraction import Bsite_extractor
 def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('--prot_file', '-p', required=True, help='input protein file (pdb)')
+    parser.add_argument('--dataset_file', '-d', required=True, help='dataset file with protein names')
+    parser.add_argument('--protein_path', '-pp', required=True, help='directory of protein files')
     parser.add_argument('--model_path', '-mp', required=True, help='directory of models')
     parser.add_argument('--model', '-m', choices=['orig','lds'], default='orig', help='select model')
     parser.add_argument('--output', '-o', required=True, help='name of the output directory')
@@ -32,20 +33,27 @@ def parse_args():
 
 args = parse_args()
 
-if not os.path.exists(args.prot_file):
-    raise IOError('%s does not exist.' % args.prot_file)
+if not os.path.exists(args.dataset_file):
+    raise IOError('%s does not exist.' % args.dataset_file)
+if not os.path.exists(args.protein_path):
+    raise IOError('%s does not exist.' % args.protein_path)
 if not os.path.exists(args.model_path):
     raise IOError('%s does not exist.' % args.model_path)
 if not os.path.exists(args.output):
     os.makedirs(args.output)
 
-prot = Protein(args.prot_file,args.protonate,args.expand,args.f,args.output, args.discard_points)
+with open(args.dataset_file,'r') as f:
+    lines = f.readlines()
 
-nn = Network(args.model_path,args.model,args.voxel_size)
+protein_names = [line[:-1] for line in lines]
 
-lig_scores = nn.get_lig_scores(prot,args.batch)
+for prot in protein_names:
+    protein = Protein(os.path.join(args.protein_path,prot+'.pdb'),args.protonate,args.expand,args.f,args.output, args.discard_points)
 
-extractor = Bsite_extractor(args.T)
-
-extractor.extract_bsites(prot,lig_scores)
-
+    nn = Network(args.model_path,args.model,args.voxel_size)
+    
+    lig_scores = nn.get_lig_scores(protein,args.batch)
+    
+    extractor = Bsite_extractor(args.T)
+    
+    extractor.extract_bsites(protein,lig_scores)
