@@ -17,7 +17,7 @@ class Protein:
         self.save_path = os.path.join(save_path,prot_id)
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
-        self.mol = pybel.readfile(prot_file.split('.')[-1],prot_file).next() 
+        self.mol = next(pybel.readfile(prot_file.split('.')[-1],prot_file)) 
         surfpoints_file = os.path.join(self.save_path,prot_id+'.surfpoints')
         os.system('dms '+prot_file+' -d 0.2 -n -o '+surfpoints_file)
         if not os.path.exists(surfpoints_file):

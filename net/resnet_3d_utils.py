@@ -6,9 +6,9 @@ Created on Thu Nov  1 17:04:52 2018
 @author: smylonas
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+
+
+
 
 import collections, numpy as np
 

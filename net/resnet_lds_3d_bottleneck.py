@@ -6,9 +6,9 @@ Created on Wed Jan  2 13:35:32 2019
 @author: smylonas
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+
+
+
 
 import tensorflow as tf
 from tensorflow.contrib import layers

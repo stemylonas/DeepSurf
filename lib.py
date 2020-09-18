@@ -14,7 +14,7 @@ from sklearn.cluster import KMeans
 
 def mol2_reader(mol_file):  # does not handle H2
     if mol_file[-4:] != 'mol2':
-        print 'cant read no mol2 file'
+        print('cant read no mol2 file')
         return
     
     with open(mol_file,'r') as f:
@@ -35,10 +35,10 @@ def readSurfPoints(surf_file):
     
     lines = [l for l in lines if len(l.split())>7]
     if len(lines)>100000:
-        print 'Large size'
+        print('Large size')
         return
     if len(lines)==0:
-        print 'Empty file'
+        print('Empty file')
         return
     
     coords = np.zeros((len(lines),3))
@@ -75,7 +75,7 @@ def simplify_dms(init_surf_file, factor):
     centers = kmeans.cluster_centers_
     cluster_idx,freq = np.unique(point_labels,return_counts=True)
     if len(cluster_idx)!=nCl:  # need to be removed
-        print 'error'
+        print('error')
 
     idxs = []
     for cl in cluster_idx:
@@ -95,7 +95,7 @@ def rotation(n):
             Q[0,0] = -1
             return Q
         else:
-            print 'not possible'
+            print('not possible')
         
     rx = -n[1]/np.sqrt(n[0]*n[0]+n[1]*n[1])
     ry = n[0]/np.sqrt(n[0]*n[0]+n[1]*n[1])

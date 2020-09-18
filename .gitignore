@@ -2,7 +2,7 @@ __pycache__/
 *.py[cod]
 *~
 results/
-models/
+*models/
 *.so
 *.o
 *.7z

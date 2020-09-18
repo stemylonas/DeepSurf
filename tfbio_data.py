@@ -1,3 +1,8 @@
+"""
+Original source of this file:
+from https://gitlab.com/cheminfIBB/tfbio
+"""
+
 import pickle
 
 import numpy as np
@@ -5,6 +10,7 @@ import numpy as np
 import pybel
 from math import ceil, sin, cos, sqrt, pi
 from itertools import combinations
+import collections
 
 
 class Featurizer():
@@ -160,7 +166,7 @@ class Featurizer():
         self.CALLABLES = []
         if custom_properties is not None:
             for i, func in enumerate(custom_properties):
-                if not callable(func):
+                if not isinstance(func, collections.Callable):
                     raise TypeError('custom_properties should be list of'
                                     ' callables, got %s instead' % type(func))
                 name = getattr(func, '__name__', '')
@@ -251,7 +257,7 @@ class Featurizer():
         features = np.zeros((len(molecule.atoms), len(self.__PATTERNS)))
         #print 'Here'
         for (pattern_id, pattern) in enumerate(self.__PATTERNS):
-            atoms_with_prop = np.array(list(*zip(*pattern.findall(molecule))),
+            atoms_with_prop = np.array(list(*list(zip(*pattern.findall(molecule)))),
                                        dtype=int) - 1
             features[atoms_with_prop, pattern_id] = 1.0
         return features
@@ -394,7 +400,7 @@ for a1 in range(3):
         ROTATIONS.append(rotation_matrix(axis, theta))
 
 # about each face diagonal - 6 rotations
-for (a1, a2) in combinations(range(3), 2):
+for (a1, a2) in combinations(list(range(3)), 2):
     axis = np.zeros(3)
     axis[[a1, a2]] = 1.0
     theta = pi
