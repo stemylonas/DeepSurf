@@ -68,7 +68,7 @@ def simplify_dms(init_surf_file, factor):
     coords, normals = readSurfPoints(init_surf_file)
 
     nPoints = len(coords)
-    nCl = nPoints/factor
+    nCl = nPoints//factor
     
     kmeans = KMeans(n_clusters=nCl,max_iter=300,n_init=1).fit(coords)
     point_labels = kmeans.labels_
