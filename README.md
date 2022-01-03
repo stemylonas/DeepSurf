@@ -1,5 +1,5 @@
 # DeepSurf
-A surface-based deep learning approach for the prediction of ligand binding sites on proteins
+A surface-based deep learning approach for the prediction of ligand binding sites on proteins (https://doi.org/10.1093/bioinformatics/btab009)
 
 Installation
 ---------------
