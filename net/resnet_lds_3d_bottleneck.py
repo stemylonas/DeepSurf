@@ -1,14 +1,8 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
 """
 Created on Wed Jan  2 13:35:32 2019
 
 @author: smylonas
 """
-
-
-
-
 
 import tensorflow as tf
 from tensorflow.contrib import layers
@@ -19,8 +13,7 @@ from tensorflow.contrib.layers.python.layers import utils
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import nn_ops
 from tensorflow.python.ops import variable_scope
-import resnet_3d_utils
-
+from net import resnet_3d_utils
 from lds import amul as amul_module
 
 resnet_arg_scope = resnet_3d_utils.resnet_arg_scope
@@ -36,7 +29,7 @@ def bottleneck(inputs,
                scope=None):
 
   with variable_scope.variable_scope(scope, 'resid_v1', [inputs]) as sc:
-   # print (inputs.shape)
+
     depth_in = utils.last_dimension(inputs.get_shape(), min_rank=5)
     if depth_out == depth_in:
       shortcut = resnet_3d_utils.subsample(inputs, stride, 'shortcut')
@@ -46,19 +39,15 @@ def bottleneck(inputs,
     residual = layers.conv3d(inputs, depth_bottleneck, 1, stride=1, scope='conv1')
     
     residual1 = resnet_3d_utils.conv3d_same(residual, depth_bottleneck, 3, stride, scope='conv2')   
-    #residual1 = layers.conv3d(residual1, depth_out, 1, stride=1, scope='conv3')
-    
+        
     with tf.variable_scope(scope, 'Amul', [inputs]):
       amul = amul_module.amul
-#
-     # residual2 = inputs   
+
       residual2 = tf.pad(residual, [[0,0],[1,1],[1,1],[1,1],[0,0]], "CONSTANT")
       Amul_weight = tf.contrib.slim.model_variable('Amul_weight', shape=[27,27]) 
       residual2 = amul(residual2, Amul_weight)
       residual2 = layers.conv3d(residual2, depth_bottleneck, [3, 3, 3], padding='SAME', stride=[x*stride for x in [3,3,3]], scope='conv_amul')
-#      #residual2 = resnet_3d_utils.conv3d_same(residual2, depth, 3, stride=3, scope='conv1_amul') 
-      #tf.summary.histogram('Amul_weight_1',Amul_weight_1)
-#      
+      
     residual_concat = tf.concat([residual1, residual2], 4)
     residual_concat = layers.conv3d(residual_concat, depth_out, [1, 1, 1], stride=1, scope='conv_concat', activation_fn=None)	
     output = nn_ops.relu(shortcut + residual_concat)
@@ -114,13 +103,6 @@ def resnet_v1(inputs,
         outputs_collections=end_points_collection):
       with arg_scope([layers.batch_norm], is_training=is_training):
         net = inputs
-#        if include_root_block:
-#          if output_stride is not None:
-#            if output_stride % 4 != 0:
-#              raise ValueError('The output_stride needs to be a multiple of 4.')
-#            output_stride /= 4
-#          net = resnet_utils.conv2d_same(net, 64, 7, stride=2, scope='conv1')
-#          net = layers_lib.max_pool2d(net, [3, 3], stride=2, scope='pool1')
         net = resnet_3d_utils.stack_blocks_dense(net, blocks, output_stride)
         if global_pool:
           net = math_ops.reduce_mean(net, [1, 2, 3], name='pool5', keepdims=True)

@@ -1,14 +1,8 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
 """
 Created on Thu Nov  1 12:04:04 2018
 
 @author: smylonas
 """
-
-
-
-
 
 import tensorflow as tf
 from tensorflow.contrib import layers
@@ -19,7 +13,7 @@ from tensorflow.contrib.layers.python.layers import utils
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import nn_ops
 from tensorflow.python.ops import variable_scope
-import resnet_3d_utils
+from net import resnet_3d_utils
 
 resnet_arg_scope = resnet_3d_utils.resnet_arg_scope
 
@@ -118,13 +112,6 @@ def resnet_v1(inputs,
         outputs_collections=end_points_collection):
       with arg_scope([layers.batch_norm], is_training=is_training):
         net = inputs
-#        if include_root_block:
-#          if output_stride is not None:
-#            if output_stride % 4 != 0:
-#              raise ValueError('The output_stride needs to be a multiple of 4.')
-#            output_stride /= 4
-#          net = resnet_utils.conv2d_same(net, 64, 7, stride=2, scope='conv1')
-#          net = layers_lib.max_pool2d(net, [3, 3], stride=2, scope='pool1')
         net = resnet_3d_utils.stack_blocks_dense(net, blocks, output_stride)
         if global_pool:
           net = math_ops.reduce_mean(net, [1, 2, 3], name='pool5', keepdims=True)
