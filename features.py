@@ -7,7 +7,7 @@ Created on Mon Oct 21 11:46:54 2019
 """
 
 import tfbio_data 
-from lib import rotation
+from utils import rotation
 import numpy as np
      
 
