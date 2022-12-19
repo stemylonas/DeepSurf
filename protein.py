@@ -46,7 +46,7 @@ class Protein:
                 lines = f.readlines()
             self.heavy_atom_lines = [line for line in lines if line[:4]=='ATOM' and line.split()[2][0]!='H']
             if len(self.heavy_atom_lines) != len(self.heavy_atom_coords):
-  	        raise Exception('Incosistency between Coords and PDBLines')
+                raise Exception('Incosistency between Coords and PDBLines')
         else:
             raise IOError('Protein file should be .pdb')
               
