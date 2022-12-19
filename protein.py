@@ -46,7 +46,11 @@ class Protein:
                 lines = f.readlines()
             self.heavy_atom_lines = [line for line in lines if line[:4]=='ATOM' and line.split()[2][0]!='H']
             if len(self.heavy_atom_lines) != len(self.heavy_atom_coords):
-                raise Exception('Incosistency between Coords and PDBLines')
+                ligand_in_pdb = len([line for line in lines if line.startswith('HETATM')])>0
+                if ligand_in_pdb:
+                    raise Exception('Ligand found in PDBfile. Please remove it to procede.')
+                else:
+                    raise Exception('Incosistency between Coords and PDBLines')
         else:
             raise IOError('Protein file should be .pdb')
               
