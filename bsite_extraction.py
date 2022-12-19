@@ -45,6 +45,7 @@ class Bsite_extractor():
     def extract_bsites(self,prot,lig_scores):
         clusters = self._cluster_points(prot,lig_scores)
         if len(clusters)==0:
+            print('No binding site found')
             return
         for cluster in clusters:
             prot.add_bsite(cluster)
