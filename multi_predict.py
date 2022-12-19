@@ -28,6 +28,7 @@ def parse_args():
     parser.add_argument('--protonate', action='store_true', help='whether to protonate or not the input protein')
     parser.add_argument('--expand', action='store_true', help='whether to expand on residue level the extracted binding sites')
     parser.add_argument('--discard_points', action='store_true', help='whether to output or not the computed surface points')
+    parser.add_argument('--seed', type=int, default=None, help='random seed for KMeans clustering')
 
     return parser.parse_args()
 
@@ -53,7 +54,7 @@ extractor = Bsite_extractor(args.T)
 
 for prot in tqdm(protein_names):
     print(prot)
-    protein = Protein(os.path.join(args.protein_path,prot+'.pdb'), args.protonate, args.expand, args.f, args.output, args.discard_points)
+    protein = Protein(os.path.join(args.protein_path,prot+'.pdb'), args.protonate, args.expand, args.f, args.output, args.discard_points, args.seed)
     
     lig_scores = nn.get_lig_scores(protein, args.batch)
        

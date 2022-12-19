@@ -1,21 +1,18 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
 """
 Created on Tue Jul 30 13:39:49 2019
 
 @author: smylonas
 """
 
+import warnings
 import numpy as np
 from scipy.spatial.distance import euclidean
 from sklearn.cluster import KMeans
 
 
-
 def mol2_reader(mol_file):  # does not handle H2
     if mol_file[-4:] != 'mol2':
-        print('cant read no mol2 file')
-        return
+        raise Exception("File's extension is not .mol2")
     
     with open(mol_file,'r') as f:
         lines = f.readlines()
@@ -35,10 +32,10 @@ def readSurfPoints(surf_file):
     
     lines = [l for l in lines if len(l.split())>7]
     if len(lines)>100000:
-        print('Large size')
+        warnings.warn('{} has too many points'.format(surf_file))
         return
     if len(lines)==0:
-        print('Empty file')
+        warnings.warn('{} is empty'.format(surf_file))
         return
     
     coords = np.zeros((len(lines),3))
@@ -63,19 +60,22 @@ def readSurfPoints(surf_file):
     return coords, normals
 
 
-def simplify_dms(init_surf_file, factor):
-    
+def simplify_dms(init_surf_file, factor, seed=None):
+       
     coords, normals = readSurfPoints(init_surf_file)
+    
+    if factor == 1:
+        return coords, normals
 
     nPoints = len(coords)
     nCl = nPoints//factor
     
-    kmeans = KMeans(n_clusters=nCl,max_iter=300,n_init=1).fit(coords)
+    kmeans = KMeans(n_clusters=nCl, max_iter=300, n_init=1, random_state=seed).fit(coords)
     point_labels = kmeans.labels_
     centers = kmeans.cluster_centers_
     cluster_idx,freq = np.unique(point_labels,return_counts=True)
-    if len(cluster_idx)!=nCl:  # need to be removed
-        print('error')
+    if len(cluster_idx)!=nCl:
+        raise Exception('Number of created clusters should be equal to nCl')
 
     idxs = []
     for cl in cluster_idx:
@@ -120,11 +120,3 @@ def rotation(n):
      
     return Q                                                                              
 
-
-    
-
-
-
-
-
-    

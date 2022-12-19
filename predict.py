@@ -25,6 +25,7 @@ def parse_args():
     parser.add_argument('--protonate', action='store_true', help='whether to protonate or not the input protein')
     parser.add_argument('--expand', action='store_true', help='whether to expand on residue level the extracted binding sites')
     parser.add_argument('--discard_points', action='store_true', help='whether to output or not the computed surface points')
+    parser.add_argument('--seed', type=int, default=None, help='random seed for KMeans clustering')
 
     return parser.parse_args()
 
@@ -38,7 +39,7 @@ if not os.path.exists(args.model_path):
 if not os.path.exists(args.output):
     os.makedirs(args.output)
 
-prot = Protein(args.prot_file,args.protonate,args.expand,args.f,args.output, args.discard_points)
+prot = Protein(args.prot_file,args.protonate,args.expand,args.f,args.output, args.discard_points, args.seed)
 
 nn = Network(args.model_path,args.model,args.voxel_size)
 

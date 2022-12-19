@@ -12,7 +12,7 @@ from utils import simplify_dms
 
 
 class Protein:
-    def __init__(self,prot_file,protonate,expand_residue,f,save_path,discard_points):
+    def __init__(self,prot_file,protonate,expand_residue,f,save_path,discard_points,seed=None):
         prot_id = prot_file.split('/')[-1].split('.')[0]
         self.save_path = os.path.join(save_path,prot_id)
         if not os.path.exists(self.save_path):
@@ -24,7 +24,7 @@ class Protein:
         os.system('dms '+prot_file+' -d 0.2 -n -o '+surfpoints_file)
         if not os.path.exists(surfpoints_file):
             raise Exception('probably DMS not installed')
-        self.surf_points, self.surf_normals = simplify_dms(surfpoints_file,f)     
+        self.surf_points, self.surf_normals = simplify_dms(surfpoints_file, f, seed=seed)     
         if discard_points:
             os.remove(surfpoints_file)
             
