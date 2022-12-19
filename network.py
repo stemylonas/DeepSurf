@@ -39,16 +39,15 @@ class Network:
         
         self.featurizer = KalasantyFeaturizer(gridSize,voxelSize)
         
-    def get_lig_scores(self,prot,batch_size):
+    def get_lig_scores(self, prot, batch_size):
         self.featurizer.get_channels(prot.mol)
-        prot.removeh()
-        
+
         gridSize = 16
         lig_scores = []
         input_data = np.zeros((batch_size,gridSize,gridSize,gridSize,18))  
         batch_cnt = 0
         for p,n in zip(prot.surf_points,prot.surf_normals):
-            input_data[batch_cnt,:,:,:,:] = self.featurizer.grid_feats(p,n,prot.atom_coords)  
+            input_data[batch_cnt,:,:,:,:] = self.featurizer.grid_feats(p,n,prot.heavy_atom_coords)  
             batch_cnt += 1
             if batch_cnt==batch_size:
                 output = self.sess.run(self.end_points,feed_dict={self.inputs:input_data}) 

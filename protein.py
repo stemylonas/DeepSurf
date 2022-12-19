@@ -8,7 +8,7 @@ Created on Thu Jan 30 12:45:54 2020
 
 import os, numpy as np
 import pybel
-from lib import simplify_dms, mol2_reader
+from utils import simplify_dms
 
 
 class Protein:
@@ -17,48 +17,43 @@ class Protein:
         self.save_path = os.path.join(save_path,prot_id)
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
+       
         self.mol = next(pybel.readfile(prot_file.split('.')[-1],prot_file)) 
+        
         surfpoints_file = os.path.join(self.save_path,prot_id+'.surfpoints')
         os.system('dms '+prot_file+' -d 0.2 -n -o '+surfpoints_file)
         if not os.path.exists(surfpoints_file):
             raise Exception('probably DMS not installed')
-        self.surf_points, self.surf_normals = simplify_dms(surfpoints_file,f)  
+        self.surf_points, self.surf_normals = simplify_dms(surfpoints_file,f)     
         if discard_points:
             os.remove(surfpoints_file)
             
         self.expand_residue = expand_residue
         if expand_residue:
-            self.removeh()
+            self.mol.removeh()
             self.atom2residue = np.array([atom.residue.idx for atom in self.mol.atoms])
             self.residue2atom = np.array([[atom.idx - 1 for atom in resid.atoms] for resid in self.mol.residues])
-            self.addh()
+            self.mol.addh()
         else:
             if protonate:      
                 self.mol.addh()
-            self.atom_coords = np.array([atom.coords for atom in self.mol.atoms])
-        
+
+        self.heavy_atom_coords = np.array([atom.coords for atom in self.mol.atoms if atom.atomicnum > 1])
+              
         self.binding_sites = []
         if prot_file.endswith('pdb'):
             with open(prot_file,'r') as f:    
                 lines = f.readlines()
-                self.lines = [line for line in lines if line[:4]=='ATOM' and line.split()[2][0]!='H']            
+            self.heavy_atom_lines = [line for line in lines if line[:4]=='ATOM' and line.split()[2][0]!='H']
+            if len(self.heavy_atom_lines) != len(self.heavy_atom_coords):
+  	        raise Exception('Incosistency between Coords and PDBLines')
         else:
             raise IOError('Protein file should be .pdb')
-        
-        
-    
-    def addh(self):
-        self.mol.addh()
-        self.atom_coords = np.array([atom.coords for atom in self.mol.atoms])
-    
-    def removeh(self):
-        self.mol.removeh()
-        self.atom_coords = np.array([atom.coords for atom in self.mol.atoms])
-        
+              
     def _surfpoints_to_atoms(self,surfpoints):
         close_atoms = np.zeros(len(surfpoints),dtype=int)
         for p,surf_coord in enumerate(surfpoints):
-            dist = np.sqrt(np.sum((self.atom_coords-surf_coord)**2,axis=1))
+            dist = np.sqrt(np.sum((self.heavy_atom_coords-surf_coord)**2,axis=1))
             close_atoms[p] = np.argmin(dist)
         
         return np.unique(close_atoms)
@@ -68,7 +63,7 @@ class Protein:
         if self.expand_residue:
             residue_idxs = np.unique(self.atom2residue[atom_idxs])
             atom_idxs = np.concatenate(self.residue2atom[residue_idxs])
-        self.binding_sites.append(Bsite(self.atom_coords,atom_idxs,cluster[1]))
+        self.binding_sites.append(Bsite(self.heavy_atom_coords,atom_idxs,cluster[1]))
         
     def sort_bsites(self):
         avg_scores = np.array([bsite.score for bsite in self.binding_sites])
@@ -81,10 +76,10 @@ class Protein:
         
         centers = np.array([bsite.center for bsite in self.binding_sites])
         np.savetxt(os.path.join(self.save_path,'centers.txt'), centers, delimiter=' ', fmt='%10.3f')
-        
+
         for i,bsite in enumerate(self.binding_sites):
             with open(os.path.join(self.save_path,'pocket'+str(i+1)+'.pdb'),'w') as f:
-                outlines = [self.lines[idx] for idx in bsite.atom_idxs]
+                outlines = [self.heavy_atom_lines[idx] for idx in bsite.atom_idxs]
                 f.writelines(outlines)
 
 

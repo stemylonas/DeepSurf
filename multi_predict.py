@@ -6,10 +6,11 @@ Created on Tue Feb 25 16:04:47 2020
 @author: smylonas
 """
 
-import argparse, os
-from protein import Protein
+import argparse, os, time
 from network import Network
+from protein import Protein
 from bsite_extraction import Bsite_extractor
+from tqdm import tqdm
 
 
 def parse_args():
@@ -33,8 +34,6 @@ def parse_args():
 
 args = parse_args()
 
-if not os.path.exists(args.dataset_file):
-    raise IOError('%s does not exist.' % args.dataset_file)
 if not os.path.exists(args.protein_path):
     raise IOError('%s does not exist.' % args.protein_path)
 if not os.path.exists(args.model_path):
@@ -42,18 +41,22 @@ if not os.path.exists(args.model_path):
 if not os.path.exists(args.output):
     os.makedirs(args.output)
 
+st = time.time()
+
 with open(args.dataset_file,'r') as f:
     lines = f.readlines()
 
-protein_names = [line[:-1] for line in lines]
+protein_names = [line.strip() for line in lines if line!='\n']
 
-for prot in protein_names:
-    protein = Protein(os.path.join(args.protein_path,prot+'.pdb'),args.protonate,args.expand,args.f,args.output, args.discard_points)
+nn = Network(args.model_path, args.model, args.voxel_size)
+extractor = Bsite_extractor(args.T)
 
-    nn = Network(args.model_path,args.model,args.voxel_size)
+for prot in tqdm(protein_names):
+    print(prot)
+    protein = Protein(os.path.join(args.protein_path,prot+'.pdb'), args.protonate, args.expand, args.f, args.output, args.discard_points)
     
-    lig_scores = nn.get_lig_scores(protein,args.batch)
-    
-    extractor = Bsite_extractor(args.T)
-    
-    extractor.extract_bsites(protein,lig_scores)
+    lig_scores = nn.get_lig_scores(protein, args.batch)
+       
+    extractor.extract_bsites(protein, lig_scores)
+
+print('Total time:', time.time()-st)
