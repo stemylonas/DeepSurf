@@ -3,4 +3,4 @@ tensorflow-gpu==1.13.1
 openbabel==2.4.1
 scipy==1.2.2
 scikit-learn==0.20.3
-protobuf==3.6.1
+protobuf==3.18.3
