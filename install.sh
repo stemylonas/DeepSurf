@@ -1,10 +1,11 @@
-conda create -n deepsurf python=3.6
+conda create -n deepsurf python=3.6.9
 conda activate deepsurf
 sudo apt update
 sudo apt install -y p7zip
 sudo apt install -y libopenbabel-dev
 sudo apt install -y g++
 sudo apt install -y swig
+conda install pytorch==1.2.0 torchvision==0.4.0 cudatoolkit=10.0 -c pytorch
 conda install -c conda-forge openbabel
 pip install numpy==1.13.3
 pip install tensorflow-gpu==1.13.1
