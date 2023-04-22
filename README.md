@@ -44,11 +44,22 @@ sudo make install
 cd ..
 ```
 
+Or easily setup by using install.sh:
+```
+chmod +x install.sh
+./install.sh
+```
+
 Usage example
 ---------------
 
 ```
 python predict.py -p protein.pdb -mp model_path -o output_path
+```
+
+Ex:
+```
+python predict.py -p protein.pdb -mp models/ -o output
 ```
 
 For more input options, check 'predict.py'. All other molecules (waters, ions, ligands) should be removed from the structure. If the input protein has not been protonated, add --protonate to the execution command.\
