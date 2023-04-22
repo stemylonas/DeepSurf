@@ -7,7 +7,7 @@ import pickle
 
 import numpy as np
 
-import pybel
+from openbabel import pybel
 from math import ceil, sin, cos, sqrt, pi
 from itertools import combinations
 import collections
