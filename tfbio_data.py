@@ -62,7 +62,7 @@ class Featurizer():
             specified this argument is ignored.
         named_properties: list of strings, optional
             Names of atomic properties to retrieve from pybel.Atom object. If
-            not specified ['hyb', 'heavyvalence', 'heterovalence',
+            not specified ['hyb', 'heavydegree', 'heterodegree',
             'partialcharge'] is used.
         save_molecule_codes: bool, optional (default True)
             If set to True, there will be an additional feature to save
@@ -151,7 +151,7 @@ class Featurizer():
             self.NAMED_PROPS = named_properties
         else:
             # pybel.Atom properties to save
-            self.NAMED_PROPS = ['hyb', 'heavyvalence', 'heterovalence',
+            self.NAMED_PROPS = ['hyb', 'heavydegree', 'heterodegree',
                                 'partialcharge']
         self.FEATURE_NAMES += self.NAMED_PROPS
 
